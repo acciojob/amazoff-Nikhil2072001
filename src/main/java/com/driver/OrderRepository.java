@@ -89,12 +89,60 @@ public void addOrderPartnerPair(String Oid,String Pid){
         }
         return size-count;
     }
-public Integer getOrdersLeftAfterGivenTimeByPartnerId(String time,String id){
-        return 0;
-}
-public String getLastDeliveryTimeByPartnerId(String id){
-        return null;
-}
+//public Integer getOrdersLeftAfterGivenTimeByPartnerId(String time,String id){
+//        return 0;
+//}
+//public String getLastDeliveryTimeByPartnerId(String id){
+//        return null;
+//}
+
+    public String getLastDeliveryTimeByPartnerId(String id){
+        int maxTime = 0;
+        if(deliveryPartnerHashMap.containsKey(id) && partnerOrderHashMap.containsKey(id)){
+            List<String> orderIds = partnerOrderHashMap.get(id);
+            for (String orderId : orderIds) {
+                maxTime = Math.max(maxTime, orderHashMap.get(orderId).getDeliveryTime());
+            }
+        }
+
+        int hh = maxTime/60;
+        int mm = maxTime%60;
+        String time = "";
+        if(hh!=0) {
+            if (hh < 10) {
+                time += "0" + hh;
+            } else {
+                time += hh;
+            }
+        }else{
+            time+="00";
+        }
+        time+=":";
+        if(mm!=0) {
+            if (mm < 10) {
+                time += "0" + mm;
+            } else {
+                time += mm;
+            }
+        }else{
+            time+="00";
+        }
+        return time;
+    }
+    public int getOrdersLeftAfterGivenTimeByPartnerId(String time, String id){
+        int count =0;
+        int givenTime =Integer.parseInt(time.substring(0,2))*60 + Integer.parseInt(time.substring(3,5));
+
+        if(deliveryPartnerHashMap.containsKey(id) && partnerOrderHashMap.containsKey(id)){
+            List<String> orderIds = partnerOrderHashMap.get(id);
+            for (String orderId : orderIds) {
+                if( orderHashMap.get(orderId).getDeliveryTime()>givenTime){
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
     public void deletePartnerById(String Pid){
         List<String > l = new ArrayList<>();
         if(partnerOrderHashMap.containsKey(Pid))
